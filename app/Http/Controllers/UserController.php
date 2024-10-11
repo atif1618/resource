@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Info;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -11,7 +11,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        echo "All users data";
+        $info = Info::all();
+        return view ('pages.index', compact('info'));
     }
 
     /**
@@ -19,7 +20,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        echo "Add New Users Data";
+        return view ('pages.create');
     }
 
     /**
@@ -27,7 +28,21 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // dd($req->all());
+      $data = $request->validate([
+
+            'name' => 'required',
+            'address' => 'required',
+            'phone' => 'required',
+
+      ]);
+          $data = Info::create([
+                'name' => $request->name,
+                'address' => $request->address,
+                'phone' => $request->phone,
+            ]);
+            // dd($data);
+            return redirect('data')->with('status','Info Added Successfully');
     }
 
     /**
@@ -35,7 +50,8 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        echo "Show this users data : $id";
+        $info = Info::where('id', $id)->get();
+        return view ('pages.show', compact('info'));
     }
 
     /**
@@ -43,7 +59,9 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        echo "edit details";
+        $info = Info::find($id);
+        // dd($info);
+        return view('pages.edit', compact('info'));
     }
 
     /**
@@ -51,7 +69,23 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+
+        $validation = $request->validate([
+
+            'name' => 'required',
+            'address' => 'required',
+            'phone' => 'required',
+
+      ]);
+      $data = Info::find($id);
+    //   dd($data);
+          $data->update([
+                'name' => $request->name,
+                'address' => $request->address,
+                'phone' => $request->phone,
+            ]);
+            // dd($data);
+            return redirect('data')->with('status', 'Info Edited Successfully');
     }
 
     /**
@@ -59,6 +93,9 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // dd($id);
+        $data = Info::find($id);
+        $data->delete();
+        return redirect ('/data')->with('status','Info Deleted Successfully');
     }
 }
